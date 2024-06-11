@@ -5,6 +5,7 @@ import {
     ManyToOne,
     OneToMany,
 } from 'typeorm';
+
 import { User } from './user';
 import { Habit } from './habit';
 

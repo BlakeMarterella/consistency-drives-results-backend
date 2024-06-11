@@ -7,7 +7,9 @@ import {
     UpdateDateColumn,
     OneToMany
 } from 'typeorm';
+
 import bcrypt from 'bcryptjs';
+
 import { Result } from './result';
 
 @Entity()
