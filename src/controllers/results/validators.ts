@@ -8,22 +8,18 @@ export const ValidateCreateBody = (body: Partial<ResultCreateBody>) => {
     if (!name) {
         throw createHttpError(400, "Name required");
     }
-    if (name.length < 5) {
-        throw createHttpError(400, "Name must contain at least 5 characters");
-    }
-
-    if (!description) {
-        throw createHttpError(400, "Description required");
-    }
-    if (description.length < 5) {
-        throw createHttpError(400, "Description must contain at least 5 characters");
+    if (name.length < 2) {
+        throw createHttpError(400, "Name must be at least 2 characters long");
     }
 
     if (!color) {
         throw createHttpError(400, "Color required");
     }
-    if (color.length < 5) {
-        throw createHttpError(400, "Color must contain at least 5 characters");
+    // Check if color is a valid hex color: #FABEBA
+    const hexColorRegex = /^#[0-9A-F]{6}$/i;
+    const isInvalidColor = !hexColorRegex.test(color);
+    if (isInvalidColor) {
+        throw createHttpError(400, "Color must be a valid hex color");
     }
 
     return body as ResultCreateBody;
