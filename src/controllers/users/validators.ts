@@ -4,13 +4,21 @@ import isEmail from 'validator/lib/isEmail';
 import type { UsersCreateBody } from '../../types/routes/users';
 
 export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
-    const { username, email, password } = body;
+    const { username, email, password, firstName, lastName } = body;
 
     if (!username) {
         throw createHttpError(400, 'Username required');
     }
     if (username.length < 5) {
         throw createHttpError(400, 'Username must contain at least 5 characters');
+    }
+
+    if (!firstName) {
+        throw createHttpError(400, 'First name required');
+    }
+
+    if (!lastName) {
+        throw createHttpError(400, 'Last name required');
     }
 
     if (!email) {

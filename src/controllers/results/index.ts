@@ -1,5 +1,4 @@
 import type { Response } from 'express';
-import createHttpError from 'http-errors';
 
 import { AppDataSource } from '../../data-source';
 import { Result } from '../../entities/result';
@@ -7,7 +6,7 @@ import type { ResultCreateBody } from '../../types/routes/result';
 import { ValidateCreateBody } from './validators';
   
 export const create = async (req: TypedRequestBody<ResultCreateBody>, res: Response): Promise<void> => {
-    const { name, description, color } = ValidateCreateBody(req.body);  
+    const { name, description } = ValidateCreateBody(req.body);  
     
     // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
     const queryRunner = AppDataSource.createQueryRunner();
@@ -18,12 +17,6 @@ export const create = async (req: TypedRequestBody<ResultCreateBody>, res: Respo
 
     try {
         const resultRepo = queryRunner.manager.getRepository(Result);
-        const nameExists = await resultRepo.exists({
-            where: { name }
-        });
-        if (nameExists) {
-            throw createHttpError(409, 'Name already exists');
-        }
 
         const newResult = resultRepo.create(req.body);
         await queryRunner.manager.save(newResult);
@@ -31,7 +24,7 @@ export const create = async (req: TypedRequestBody<ResultCreateBody>, res: Respo
         // No exceptions occured, so we commit the transaction
         await queryRunner.commitTransaction();
 
-        res.send(newResult.id);
+        res.send(newResult);
     } catch (err) {
         // As an exception occured, cancel the transaction
         await queryRunner.rollbackTransaction();

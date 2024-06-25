@@ -4,6 +4,8 @@ import {
     Column,
     ManyToOne,
     OneToMany,
+    CreateDateColumn,
+    UpdateDateColumn
 } from 'typeorm';
 
 import { User } from './user';
@@ -12,16 +14,19 @@ import { Habit } from './habit';
 @Entity()
 export class Result {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  description: string;
+  description!: string;
 
-  @Column()
-  color: string;
+  @CreateDateColumn({ nullable: false })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ nullable: false })
+  updatedAt!: Date;
 
   @ManyToOne(() => User, (user) => user.results)
   user: User;

@@ -7,7 +7,7 @@ import type { UsersCreateBody } from '../../types/routes/users';
 import { validateCreateBody } from './validators';
 
 const create = async (req: TypedRequestBody<UsersCreateBody>, res: Response) => {
-    const { username, email, password } = validateCreateBody(req.body);
+    const { username, email, password, firstName, lastName } = validateCreateBody(req.body);
 
     // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
     const queryRunner = AppDataSource.createQueryRunner();
@@ -35,6 +35,8 @@ const create = async (req: TypedRequestBody<UsersCreateBody>, res: Response) => 
         const newUser = new User();
         newUser.username = username;
         newUser.email = email;
+        newUser.firstName = firstName;
+        newUser.lastName = lastName;
         newUser.setPassword(password);
         await queryRunner.manager.save(newUser);
 
