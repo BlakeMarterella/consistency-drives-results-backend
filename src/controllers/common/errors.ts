@@ -1,0 +1,10 @@
+export const MISSING_ID : string = 'Id required';
+export const MISSING_USERNAME : string = 'Username required';
+export const MISSING_FIRST_NAME : string = 'First name required';
+export const MISSING_LAST_NAME : string = 'Last name required';
+export const MISSING_EMAIL : string = 'Email required';
+export const MISSING_PASSWORD : string = 'Password required';
+export const INVALID_EMAIL : string = 'Email is invalid';
+export const INVALID_HEX_COLOR : string = 'Color is not a valid hex color';
+export const USERNAME_TOO_SHORT : string = 'Username must contain at least 5 characters';
+export const PASSWORD_TOO_SHORT : string = 'Password must contain at least 8 characters';
