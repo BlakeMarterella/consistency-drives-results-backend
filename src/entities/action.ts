@@ -3,23 +3,21 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    OneToMany,
 } from 'typeorm';
 
 import { Habit } from './habit';
-import { Metric } from './metric';
 
 @Entity()
 export class Action {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
-  @Column()
-  name: string;
+  @Column({ nullable: false, length: 32 })
+  name!: string;
+
+  @Column({ nullable: false, length: 7 })
+  color!: string;
 
   @ManyToOne(() => Habit, (habit) => habit.actions)
-  habit: Habit;
-
-  @OneToMany(() => Metric, (metric) => metric.action)
-  metrics: Metric[];
+  habit!: Habit;
 }

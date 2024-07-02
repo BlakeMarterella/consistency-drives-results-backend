@@ -16,7 +16,7 @@ export class Result {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ nullable: false, length: 100 })
   name!: string;
 
   @Column()
@@ -28,9 +28,9 @@ export class Result {
   @UpdateDateColumn({ nullable: false })
   updatedAt!: Date;
 
-  @ManyToOne(() => User, (user) => user.results)
-  user: User;
+  @ManyToOne(() => User, (user) => user.results, { nullable: false })
+  user!: User;
 
   @OneToMany(() => Habit, (habit) => habit.result)
-  habits: Habit[];
+  habits!: Habit[];
 }

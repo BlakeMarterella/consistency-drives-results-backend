@@ -12,20 +12,20 @@ import { Action } from './action';
 @Entity()
 export class Habit {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
+
+  @Column({ nullable: false, length: 100 })
+  name!: string;
 
   @Column()
-  name: string;
+  description!: string;
 
-  @Column()
-  description: string;
+  @Column({ nullable: false, length: 7 })
+  color!: string;
 
-  @Column()
-  color: string;
-
-  @ManyToOne(() => Result, (result) => result.habits)
-  result: Result;
+  @ManyToOne(() => Result, (result) => result.habits, { nullable: false })
+  result!: Result;
 
   @OneToMany(() => Action, (action) => action.habit)
-  actions: Action[];
+  actions!: Action[];
 }
