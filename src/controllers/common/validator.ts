@@ -9,11 +9,8 @@ export class CommonValidator {
      * @param color a string representing a hex color to validate
      * @throws 400 if the color is not a valid hex color
      */
-    static validateHexColor(color: string): void {
+    static isValidHexColor(color: string): boolean {
         const hexColorPattern = /^#[0-9A-F]{6}$/i;
-        const isInvalidColor = !hexColorPattern.test(color);
-        if (isInvalidColor) {
-            throw createHttpError(400, 'Color must be a valid hex color');
-        }
+        return hexColorPattern.test(color);
     }
 }

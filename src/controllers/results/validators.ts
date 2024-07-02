@@ -7,9 +7,6 @@ export const ValidateCreateBody = (body: Partial<ResultCreateBody>) => {
     if (!name) {
         throw createHttpError(400, 'Name required');
     }
-    if (name.length < 2) {
-        throw createHttpError(400, 'Name must be at least 2 characters long');
-    }
 
     return body as ResultCreateBody;
 };

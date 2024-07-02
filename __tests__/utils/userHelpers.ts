@@ -17,6 +17,8 @@ export const createTestUser = async (testUser?: TestUserProps) => {
 
     const user = new User();
     user.username = testUser?.username || 'testUser';
+    user.firstName = testUser?.username || 'First';
+    user.lastName = testUser?.username || 'Last';
     user.email = testUser?.email || 'testUser@gmail.com';
     user.setPassword(testUser?.password || 'password');
 
