@@ -1,9 +1,10 @@
 import createHttpError from 'http-errors';
 import isEmail from 'validator/lib/isEmail';
 
-import type { UsersCreateBody } from '../../types/routes/users';
+import type { UsersCreateRequest } from '../../types/routes/users';
+import { CommonValidator } from '../common/validator';
 
-export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
+export const validateCreateRequest = (body: Partial<UsersCreateRequest>) => {
     const { username, email, password, firstName, lastName } = body;
 
     if (!username) {
@@ -37,5 +38,17 @@ export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
 
     // As the function checked the properties are not missing,
     // return the body as original type
-    return body as UsersCreateBody;
+    return body as UsersCreateRequest;
+};
+
+export const validateDeleteRequest = (id: string) => {
+    
+    if (!id) {
+        throw createHttpError(400, 'ID required');
+    }
+    if (!CommonValidator.isValidUUID(id)) {
+        throw createHttpError(400, 'ID is invalid');
+    }
+
+    return id;
 };

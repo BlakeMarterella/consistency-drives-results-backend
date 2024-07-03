@@ -18,7 +18,7 @@ afterAll(async () => {
     server.close();
 });
 
-describe('Users routes', () => {
+describe('Create user', () => {
     afterEach(async () => {
         await clearDatabase();
     });
@@ -36,7 +36,7 @@ describe('Users routes', () => {
         const user = await userRepo.findOneByOrFail({ username });
 
         expect(res.statusCode).toEqual(200);
-        expect(res.text).toEqual(user.id);
+        expect(JSON.parse(res.text)).toEqual({ id: user.id });
     });
 
     test('User creation fails if query body is invalid', async () => {
@@ -101,5 +101,37 @@ describe('Users routes', () => {
         const res2 = await request(server).post('/api/users').send({ username: 'otherUsername', email, password: 'password', firstName: firstName, lastName: lastName });
         expect(res2.statusCode).toEqual(409);
         expect(res2.body.message).toEqual('Email already exists');
+    });
+});
+
+describe('Delete user', () => {
+    afterEach(async () => {
+        await clearDatabase();
+    });
+
+    test('Delete a user', async () => {
+        const { username, email, firstName, lastName } = await createTestUser();
+
+        const userRepo = AppDataSource.getRepository(User);
+        const user = await userRepo.findOneByOrFail({ username });
+
+        const res = await request(server).delete(`/api/users/${user.id}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toEqual({ username, email, firstName, lastName });
+    });
+
+    test('Delete user fails if user does not exist', async () => {
+        const res = await request(server).delete('/api/users/d0bb847f-d901-4abe-be9e-c6ddac9d29e1');
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('User not found');
+    });
+
+    test('Delete user fails if query body is malformed id', async () => {
+        const res = await request(server).delete('/api/users/1234');
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('ID is invalid');
     });
 });

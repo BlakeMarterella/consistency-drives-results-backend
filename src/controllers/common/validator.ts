@@ -13,4 +13,21 @@ export class CommonValidator {
         const hexColorPattern = /^#[0-9A-F]{6}$/i;
         return hexColorPattern.test(color);
     }
+
+    /**
+     * In order for a UUID to be valid in TypeORM and PostGres it must:
+     * - Contain 32 characters
+     * - Only contain hexidecimal values
+     * - Be in the proper format: xxxxxxxx-xxxx-xxxx-xxxx-xxxx
+     * 
+     * This function will allow you to catch malformed UUID's to throw
+     * a custom exception earlier in the code-path.
+     * 
+     * @param uuid The unique identifier to check
+     */
+    static isValidUUID(uuid: string): boolean {
+        // Regex to test for: xxxxxxxx-xxxx-xxxx-xxxx-xxxx
+        const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+        return UUID_REGEX.test(uuid);
+    }
 }

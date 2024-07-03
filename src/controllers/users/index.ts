@@ -3,11 +3,11 @@ import createHttpError from 'http-errors';
 
 import { AppDataSource } from '../../data-source';
 import { User } from '../../entities/user';
-import type { UsersCreateBody } from '../../types/routes/users';
-import { validateCreateBody } from './validators';
+import type { UsersCreateRequest, UsersCreateResponse, UsersDeleteRequest, UsersDeleteResponse } from '../../types/routes/users';
+import { validateCreateRequest, validateDeleteRequest } from './validators';
 
-const create = async (req: TypedRequestBody<UsersCreateBody>, res: Response) => {
-    const { username, email, password, firstName, lastName } = validateCreateBody(req.body);
+const createUser = async (req: TypedRequestBody<UsersCreateRequest>, res: Response<UsersCreateResponse>) => {
+    const { username, email, password, firstName, lastName } = validateCreateRequest(req.body);
 
     // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
     const queryRunner = AppDataSource.createQueryRunner();
@@ -43,7 +43,7 @@ const create = async (req: TypedRequestBody<UsersCreateBody>, res: Response) => 
         // No exceptions occured, so we commit the transaction
         await queryRunner.commitTransaction();
 
-        res.send(newUser.id);
+        res.send({ id: newUser.id });
     } catch (err) {
         // As an exception occured, cancel the transaction
         await queryRunner.rollbackTransaction();
@@ -54,6 +54,22 @@ const create = async (req: TypedRequestBody<UsersCreateBody>, res: Response) => 
     }
 };
 
+const deleteUser = async (req: TypedRequestBody<UsersDeleteRequest>, res: Response<UsersDeleteResponse>) => {
+    const id = validateDeleteRequest(req.params.id);
+
+    const userRepo = AppDataSource.getRepository(User);
+    
+    const user = await userRepo.findOneBy({ id });
+    if (!user) {
+        throw createHttpError(400, 'User not found');
+    }
+
+    await userRepo.remove(user);
+
+    res.send({ username: user.username, email: user.email, firstName: user.firstName, lastName: user.lastName });
+};
+
 export default {
-    create,
+    createUser,
+    deleteUser
 };
