@@ -135,3 +135,17 @@ describe('Delete user', () => {
         expect(res.body.message).toEqual('ID is invalid');
     });
 });
+
+describe('List users', () => {
+    afterEach(async() => {
+        await clearDatabase();
+    });
+
+    test('List all users', async () => {
+        const user1: User = await createTestUser({ email: 'email1@gmail.com' });
+        const user2: User = await createTestUser({ email: 'email2@gmail.com' });
+        const user3: User = await createTestUser({ email: 'email3@gmail.com' });
+        
+        const res = await request(server).get
+    });
+});

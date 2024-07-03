@@ -69,6 +69,11 @@ const deleteUser = async (req: TypedRequestBody<UsersDeleteRequest>, res: Respon
     res.send({ username: user.username, email: user.email, firstName: user.firstName, lastName: user.lastName });
 };
 
+const listUsers = async (req: Request, res: Response) => {
+    const userRepo = AppDataSource.getRepository(User);
+    
+};
+
 export default {
     createUser,
     deleteUser
