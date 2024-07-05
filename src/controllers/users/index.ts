@@ -161,9 +161,37 @@ const updateUser = async (req: TypedRequestBody<UsersUpdateRequest>, res: Respon
     }
 };
 
+/**
+ * Get a user's information from the database
+ */
+const getUser = async (req: TypedRequestBody<Request>, res: Response<UsersUpdateResponse>) => {
+    const id = CommonValidator.validateUUID(req.params.id);
+
+    const queryRunner = AppDataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+        const userRepo = queryRunner.manager.getRepository(User);
+        const user = await userRepo.findOneBy({ id });
+        if (!user) {
+            throw createHttpError(400, 'User not found');
+        }
+
+        res.send(user);
+    } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+    } finally {
+        await queryRunner.release();
+    }
+}
+
 export default {
     createUser,
     updateUser,
     deleteUser,
+    getUser,
     listUsers
 };

@@ -223,15 +223,55 @@ describe('Update user', () => {
     });
 
     test("Update user's email fails if email is malformed", async () => {
+        const user = await createTestUser();
 
-    });
+        const res = await request(server).put(`/api/users/${user.id}`).send({ email: 'invalidEmail' });
 
-
-    test("Update user's password fails if email is malformed", async () => {
-
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('Email is invalid');
     });
 
     test("Update all user's information", async () => {
+        const user = await createTestUser();
+        const newEmail = 'hi@gmail.com';
+        const newFirstName = 'newFirstName';
+        const newLastName = 'newLastName';
 
+        const res = await request(server).put(`/api/users/${user.id}`).send({ email: newEmail, firstName: newFirstName, lastName: newLastName });
+        const newUser = user;
+        newUser.email = newEmail;
+        newUser.firstName = newFirstName;
+        newUser.lastName = newLastName;
+        newUser.updatedAt = res.body.updatedAt;
+
+        expect(res.statusCode).toEqual(200);
+    });
+});
+
+describe('Get User', () => {
+    afterEach(async () => {
+        await clearDatabase();
+    });
+
+    test('Get a user', async () => {
+        const user = await createTestUser();
+        const res = await request(server).get(`/api/users/${user.id}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(user);
+    });
+
+    test('Get user fails if user does not exist', async () => {
+        const res = await request(server).get('/api/users/d0bb847f-d901-4abe-be9e-c6ddac9d29e1');
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('User not found');
+    });
+
+    test('Get user fails if id is malformed', async () => {
+        const res = await request(server).get('/api/users/1234');
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('ID is invalid');
     });
 });

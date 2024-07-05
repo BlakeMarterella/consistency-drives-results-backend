@@ -1,4 +1,5 @@
 import createHttpError from 'http-errors';
+import ErrorMessages from './errorMessages';
 
 export class CommonValidator {
 
@@ -25,7 +26,7 @@ export class CommonValidator {
      * 
      * @param uuid The unique identifier to check
      */
-    static isValidUUID(uuid: string): boolean {
+    private static isValidUUID(uuid: string): boolean {
         // Regex to test for: xxxxxxxx-xxxx-xxxx-xxxx-xxxx
         const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
         return UUID_REGEX.test(uuid);
@@ -42,10 +43,10 @@ export class CommonValidator {
      */
     static validateUUID(uuid: string): string {
         if (!uuid) {
-            throw createHttpError(400, 'ID required');
+            throw createHttpError(400, ErrorMessages.MISSING_ID);
         }
         if (!CommonValidator.isValidUUID(uuid)) {
-            throw createHttpError(400, 'ID is invalid');
+            throw createHttpError(400, ErrorMessages.INVALID_ID);
         }
         return uuid;
     }
