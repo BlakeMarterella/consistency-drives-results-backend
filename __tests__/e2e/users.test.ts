@@ -142,10 +142,96 @@ describe('List users', () => {
     });
 
     test('List all users', async () => {
-        const user1: User = await createTestUser({ email: 'email1@gmail.com' });
-        const user2: User = await createTestUser({ email: 'email2@gmail.com' });
-        const user3: User = await createTestUser({ email: 'email3@gmail.com' });
+        const user1 = await createTestUser({ email: 'email1@gmail.com', username: 'username1' });
+        const user2 = await createTestUser({ email: 'email2@gmail.com', username: 'username2' });
+        const user3 = await createTestUser({ email: 'email3@gmail.com', username: 'username3' });
+        const expectedUsers = [user1, user2, user3];
+
+        const res = await request(server).get('/api/users');
         
-        const res = await request(server).get
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(expectedUsers);
+    });
+});
+
+describe('Update user', () => {
+    afterEach(async () => {
+        await clearDatabase();
+    });
+
+    test("Update a user's email", async () => {
+        const user = await createTestUser();
+        const newEmail = 'updatedEmail@gmail.com';
+
+        const res = await request(server).put(`/api/users/${user.id}`).send({ email: newEmail });
+        const newUser = user;
+        newUser.email = newEmail;
+        newUser.updatedAt = res.body.updatedAt;
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(newUser);
+    });
+
+    test("Update a user's first name", async () => {
+        const user = await createTestUser();
+        const newFirstName = 'UpdatedName';
+
+        const res = await request(server).put(`/api/users/${user.id}`).send({ firstName: newFirstName });
+        const newUser = user;
+        newUser.firstName = newFirstName;
+        newUser.updatedAt = res.body.updatedAt;
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(newUser);
+    });
+
+    test("Update a user's last name", async () => {
+        const user = await createTestUser();
+        const newLastName = 'UpdatedLastName';
+
+        const res = await request(server).put(`/api/users/${user.id}`).send({ lastName: newLastName });
+        const newUser = user;
+        newUser.lastName = newLastName;
+        newUser.updatedAt = res.body.updatedAt;
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(newUser);
+    });
+
+    test('Update user fails if user does not exist', async () => {
+        const res = await request(server).put('/api/users/d0bb847f-d901-4abe-be9e-c6ddac9d29e1').send({ firstName: 'UpdatedName' });
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('User not found');
+    });
+
+    test("Update user fails if id is malformed", async () => {
+        const res = await request(server).put('/api/users/1234').send({ firstName: 'UpdatedName' });
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('ID is invalid');
+    });
+
+    test("Update user's email fails if email is already taken", async () => {
+        const user1 = await createTestUser({ email: 'blake@gmail.com' });
+        const user2 = await createTestUser({ email: 'rahul@gmail.com' });
+
+        const res = await request(server).put(`/api/users/${user1.id}`).send({ email: user2.email });
+
+        expect(res.statusCode).toEqual(409);
+        expect(res.body.message).toEqual('Email already exists');
+    });
+
+    test("Update user's email fails if email is malformed", async () => {
+
+    });
+
+
+    test("Update user's password fails if email is malformed", async () => {
+
+    });
+
+    test("Update all user's information", async () => {
+
     });
 });

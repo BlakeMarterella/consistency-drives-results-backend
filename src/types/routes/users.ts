@@ -1,3 +1,5 @@
+import type { User } from 'src/entities/user';
+
 export interface UsersCreateRequest {
     username: string;
     email: string;
@@ -22,17 +24,11 @@ export interface UsersDeleteResponse {
 }
 
 export interface UsersUpdateRequest {
-    id: string;
     email?: string;
     firstName?: string;
     lastName?: string;
-    password?: string;
 }
 
-export interface UsersUpdateResponse {
-    id: string;
-    username: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-}
+export type UsersUpdateResponse = User;
+
+export type UsersListResponse = User[];
