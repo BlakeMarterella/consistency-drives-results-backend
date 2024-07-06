@@ -2,39 +2,39 @@ import type { Response } from 'express';
 
 import { AppDataSource } from '../../data-source';
 import { Result } from '../../entities/result';
-import type { ResultCreateBody } from '../../types/routes/result';
-import { ValidateCreateBody } from './validators';
+import type { ResultsCreateRequest, ResultsCreateResponse } from '../../types/routes/results';
+import { AdvancedValidator, BasicValidator } from './validators';
+import { User } from '../../entities/user';
   
-export const create = async (req: TypedRequestBody<ResultCreateBody>, res: Response): Promise<void> => {
-    const { name, description } = ValidateCreateBody(req.body);  
+export const createResult = async (req: TypedRequestBody<ResultsCreateRequest>, res: Response<ResultsCreateResponse>): Promise<void> => {
+    const { userId, name, description } = BasicValidator.validateCreateRequest(req.body);
     
-    // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
     const queryRunner = AppDataSource.createQueryRunner();
 
-    // Connect the query runner to the database and start the transaction
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
         const resultRepo = queryRunner.manager.getRepository(Result);
 
-        const newResult = resultRepo.create(req.body);
-        await queryRunner.manager.save(newResult);
+        const newResult = new Result();
+        await AdvancedValidator.findUserById(userId, queryRunner.manager.getRepository(User));
+        newResult.user.id = userId;
+        newResult.name = name;
+        newResult.description = description;
+        await resultRepo.save(newResult);
 
-        // No exceptions occured, so we commit the transaction
         await queryRunner.commitTransaction();
 
-        res.send(newResult);
+        res.send({ id: newResult.id });
     } catch (err) {
-        // As an exception occured, cancel the transaction
         await queryRunner.rollbackTransaction();
         throw err;
     } finally {
-        // We need to release the query runner to not keep a useless connection to the database
         await queryRunner.release();
     }
 };
 
 export default {
-    create,
+    createResult,
 };

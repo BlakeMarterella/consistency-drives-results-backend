@@ -20,7 +20,7 @@ export class Result {
   name!: string;
 
   @Column()
-  description!: string;
+  description?: string;
 
   @CreateDateColumn({ nullable: false })
   createdAt!: Date;

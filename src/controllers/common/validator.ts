@@ -41,7 +41,7 @@ export class CommonValidator {
      * @throws 400 if the UUID is null
      * @throws 400 if the UUID is not a valid 
      */
-    static validateUUID(uuid: string): string {
+    static validateUUID(uuid?: string): string {
         if (!uuid) {
             throw createHttpError(400, ErrorMessages.MISSING_ID);
         }

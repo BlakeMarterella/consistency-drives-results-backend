@@ -12,7 +12,9 @@ const ErrorMessages = {
     INVALID_HEX_COLOR :  'Color is not a valid hex color',
     USERNAME_TOO_SHORT :  'Username must contain at least 5 characters',
     PASSWORD_TOO_SHORT : 'Password must contain at least 8 characters',
-    USER_NOT_FOUND : 'User not found'
+    USER_NOT_FOUND : 'User not found',
+    MISSING_RESULT_NAME: 'Result name required',
+    RESULT_NAME_TOO_LONG: 'Result name too long',
 };
 
 export default ErrorMessages;
