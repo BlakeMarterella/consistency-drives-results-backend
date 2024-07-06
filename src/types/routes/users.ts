@@ -25,6 +25,7 @@ export interface UsersDeleteResponse {
 
 export interface UsersUpdateRequest {
     email?: string;
+    username?: string;
     firstName?: string;
     lastName?: string;
 }

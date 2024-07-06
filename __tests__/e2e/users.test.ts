@@ -6,6 +6,7 @@ import { User } from '../../src/entities/user';
 import { clearDatabase, closeDatabase, createTestServer } from '../utils/testsHelpers';
 import { createTestUser } from '../utils/userHelpers';
 import e from 'express';
+import ErrorMessages from 'src/controllers/common/errorMessages';
 
 let server: Server;
 
@@ -132,7 +133,7 @@ describe('Delete user', () => {
         const res = await request(server).delete('/api/users/1234');
 
         expect(res.statusCode).toEqual(400);
-        expect(res.body.message).toEqual('ID is invalid');
+        expect(res.body.message).toEqual('Id is not a valid UUID');
     });
 });
 
@@ -209,12 +210,12 @@ describe('Update user', () => {
         const res = await request(server).put('/api/users/1234').send({ firstName: 'UpdatedName' });
 
         expect(res.statusCode).toEqual(400);
-        expect(res.body.message).toEqual('ID is invalid');
+        expect(res.body.message).toEqual('Id is not a valid UUID');
     });
 
     test("Update user's email fails if email is already taken", async () => {
-        const user1 = await createTestUser({ email: 'blake@gmail.com' });
-        const user2 = await createTestUser({ email: 'rahul@gmail.com' });
+        const user1 = await createTestUser({ email: 'blake@gmail.com', username: 'blake' });
+        const user2 = await createTestUser({ email: 'rahul@gmail.com', username: 'rahul' });
 
         const res = await request(server).put(`/api/users/${user1.id}`).send({ email: user2.email });
 
@@ -272,6 +273,6 @@ describe('Get User', () => {
         const res = await request(server).get('/api/users/1234');
 
         expect(res.statusCode).toEqual(400);
-        expect(res.body.message).toEqual('ID is invalid');
+        expect(res.body.message).toEqual('Id is not a valid UUID');
     });
 });

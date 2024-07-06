@@ -4,14 +4,15 @@ import createHttpError from 'http-errors';
 import { AppDataSource } from '../../data-source';
 import { User } from '../../entities/user';
 import type { UsersCreateRequest, UsersCreateResponse, UsersDeleteRequest, UsersDeleteResponse, UsersListResponse, UsersUpdateRequest, UsersUpdateResponse } from '../../types/routes/users';
-import { validateCreateRequest, validateUpdateRequest } from './validators';
 import { CommonValidator } from '../common/validator';
+import ErrorMessages from '../common/errorMessages';
+import { BasicValidator, AdvancedValidator } from './validators';
 
 /**
  * Create a new user in the database
  */
 const createUser = async (req: TypedRequestBody<UsersCreateRequest>, res: Response<UsersCreateResponse>) => {
-    const { username, email, password, firstName, lastName } = validateCreateRequest(req.body);
+    const { username, email, password, firstName, lastName } = BasicValidator.validateCreateRequest(req.body);
 
     const queryRunner = AppDataSource.createQueryRunner();
 
@@ -20,19 +21,9 @@ const createUser = async (req: TypedRequestBody<UsersCreateRequest>, res: Respon
 
     try {
         const userRepo = queryRunner.manager.getRepository(User);
-        const usernameExists = await userRepo.exist({
-            where: { username }
-        });
-        if (usernameExists) {
-            throw createHttpError(409, 'Username already exists');
-        }
-
-        const emailExists = await userRepo.findOneBy({
-            email: email
-        });
-        if (emailExists) {
-            throw createHttpError(409, 'Email already exists');
-        }
+        
+        await AdvancedValidator.validateUniqueUsername(username, userRepo);
+        await AdvancedValidator.validateUniqueEmail(email, userRepo);
 
         const newUser = new User();
         newUser.username = username;
@@ -67,10 +58,7 @@ const deleteUser = async (req: TypedRequestBody<UsersDeleteRequest>, res: Respon
     try {
         const userRepo = queryRunner.manager.getRepository(User);
         
-        const user = await userRepo.findOneBy({ id });
-        if (!user) {
-            throw createHttpError(400, 'User not found');
-        }
+        const user = await AdvancedValidator.findUserById(id, userRepo);
 
         await userRepo.remove(user);
     
@@ -118,7 +106,7 @@ const listUsers = async (req: TypedRequestBody<Request>, res: Response<UsersList
  * Update a user's information in the database
  */
 const updateUser = async (req: TypedRequestBody<UsersUpdateRequest>, res: Response<UsersUpdateResponse>) => {
-    const { email, firstName, lastName } = validateUpdateRequest(req.body);
+    const { email, firstName, lastName, username } = BasicValidator.validateUpdateRequest(req.body);
     const id = CommonValidator.validateUUID(req.params.id);
 
     const queryRunner = AppDataSource.createQueryRunner();
@@ -128,19 +116,14 @@ const updateUser = async (req: TypedRequestBody<UsersUpdateRequest>, res: Respon
 
     try {
         const userRepo = queryRunner.manager.getRepository(User);
-        const user = await userRepo.findOneBy({ id: id });
-        if (!user) {
-            throw createHttpError(400, 'User not found');
-        }
-
+        const user = await AdvancedValidator.findUserById(id, userRepo);
         if (email) {
-            const emailExists = await userRepo.exist({
-                where: { email }
-            });
-            if (emailExists) {
-                throw createHttpError(400, 'Email already exists');
-            }
+            await AdvancedValidator.validateUniqueEmail(email, userRepo);
             user.email = email;
+        }
+        if (username) {
+            await AdvancedValidator.validateUniqueUsername(username, userRepo);
+            user.username = username;
         }
         if (firstName) {
             user.firstName = firstName;
@@ -174,10 +157,7 @@ const getUser = async (req: TypedRequestBody<Request>, res: Response<UsersUpdate
 
     try {
         const userRepo = queryRunner.manager.getRepository(User);
-        const user = await userRepo.findOneBy({ id });
-        if (!user) {
-            throw createHttpError(400, 'User not found');
-        }
+        const user = await AdvancedValidator.findUserById(id, userRepo);
 
         res.send(user);
     } catch (err) {
