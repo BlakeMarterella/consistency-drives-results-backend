@@ -15,6 +15,7 @@ const ErrorMessages = {
     USER_NOT_FOUND : 'User not found',
     MISSING_RESULT_NAME: 'Result name required',
     RESULT_NAME_TOO_LONG: 'Result name too long',
+    RESULT_NOT_FOUND: 'Result not found',
 };
 
 export default ErrorMessages;

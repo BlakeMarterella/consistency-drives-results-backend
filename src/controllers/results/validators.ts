@@ -1,9 +1,10 @@
 import createHttpError from "http-errors";
-import type { ResultsCreateRequest } from "../../types/routes/results";
+import type { ResultsCreateRequest, ResultsUpdateRequest } from "../../types/routes/results";
 import ErrorMessages from "../common/errorMessages";
 import { CommonValidator } from "../common/validator";
 import { Repository } from "typeorm";
 import { User } from "src/entities/user";
+import { Result } from "src/entities/result";
 
 /**
  * Validate the syntax of a result's input fields.
@@ -19,6 +20,19 @@ export class BasicValidator {
     CommonValidator.validateUUID(userId);
 
     return body as ResultsCreateRequest;
+  };
+
+  /**
+   * Check that all the required fields are present in the request body.
+   */
+  static validateUpdateRequest = (body: Partial<ResultsUpdateRequest>) => {
+    const { name } = body;
+
+    if (name) {
+      this.validateName(name);
+    }
+
+    return body as ResultsUpdateRequest;
   };
 
   private static validateName(name?: string) {
@@ -49,5 +63,18 @@ export class AdvancedValidator {
       throw createHttpError(400, ErrorMessages.USER_NOT_FOUND);
     }
     return user;
+  };
+
+  /**
+   * Validate that a result name is unique.
+   */
+  static findResultById = async (id: number, repo: Repository<Result>) => {
+    const result = await repo.findOne({
+        where: { id }
+    });
+    if (!result) {
+        throw createHttpError(400, ErrorMessages.RESULT_NOT_FOUND);
+    }
+    return result;
   };
 }

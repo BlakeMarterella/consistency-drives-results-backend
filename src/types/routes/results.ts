@@ -9,3 +9,20 @@ export interface ResultsCreateRequest {
 export interface ResultsCreateResponse {
     id: number;
 }
+
+export interface ResultsDeleteRequest {
+    id: number;
+}
+
+export interface ResultsDeleteResponse {
+    id: number;
+    userId: string;
+    name: string;
+}
+
+export interface ResultsUpdateRequest {
+    name?: string;
+    description?: string;
+}
+
+export type ResultsUpdateResponse = Result;

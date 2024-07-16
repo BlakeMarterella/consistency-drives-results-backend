@@ -50,4 +50,17 @@ export class CommonValidator {
         }
         return uuid;
     }
+
+    /**
+     * Perform validation on a generic identifier. For the time
+     * being, it only checks if the id exists
+     * 
+     * @param id The identifier to validate
+     */
+    static validateId(id?: number): number {
+        if (!id) {
+            throw createHttpError(400, ErrorMessages.MISSING_ID);
+        }
+        return id;
+    }
 }
