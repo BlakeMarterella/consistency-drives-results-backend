@@ -12,13 +12,15 @@ export const createResult = async (req: TypedRequestBody<ResultsCreateRequest>, 
     const queryRunner = AppDataSource.createQueryRunner();
 
     await queryRunner.connect();
-    await queryRunner.startTransaction();
-
+    
     try {
-        const resultRepo = queryRunner.manager.getRepository(Result);
-
-        const newResult = new Result();
         await AdvancedValidator.findUserById(userId, queryRunner.manager.getRepository(User));
+        
+        await queryRunner.startTransaction();
+        
+        const resultRepo = queryRunner.manager.getRepository(Result);
+        const newResult = new Result();
+        newResult.user = new User();
         newResult.user.id = userId;
         newResult.name = name;
         newResult.description = description;
