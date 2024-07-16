@@ -111,5 +111,6 @@ export const updateResult = async (req: TypedRequestBody<ResultsUpdateRequest>, 
 
 export default {
     createResult,
-    deleteResult
+    deleteResult,
+    updateResult,
 };
